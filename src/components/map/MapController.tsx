@@ -1,7 +1,6 @@
 import {LayersControl, useMap} from "react-leaflet";
 import lines from "../../../data/lines.json";
 import stations from "../../../data/stations.json";
-import {GeoJSON} from "leaflet";
 import ubahnIcon from "../../assets/u-bahn-icon.jpg";
 import sbahnIcon from "../../assets/s-bahn-icon.png";
 import {useState} from "react";
