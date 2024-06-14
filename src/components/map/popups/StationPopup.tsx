@@ -13,15 +13,18 @@ function StationPopup({station, onLineClick}: StationPopupProps) {
 
     const formattedLines = station.properties?.linesEFA.map((line: string) => {
         const style = getLineStyle(line);
-        return (<span key={line} onClick={() => onLineClick(line)} style={style}>{line}</span>);
+        return (<span key={line} className="clickable-line" onClick={() => onLineClick(line)} style={style}>{line}</span>);
     });
 
     return (
         <Popup position={[lng, lat]}>
-            <div>
-                <p><strong>Name:</strong>{station.properties?.name}</p>
-                <p><strong>Lines:</strong>{(formattedLines)}</p>
-                <p><strong>Services:</strong>{station.properties?.transportModes.join(', ')}</p>
+            <div style={{maxWidth: '250px'}}>
+                <h3><strong>{station.properties?.name}</strong></h3>
+                <p><strong>Lines:</strong></p>
+                <div style={{display: 'flex', flexWrap: 'wrap'}}>
+                    {formattedLines}
+                </div>
+                <p><strong>Services:</strong> {station.properties?.transportModes.join(', ')}</p>
             </div>
         </Popup>
     )
@@ -33,7 +36,9 @@ function getLineStyle(line: any) {
         color: 'white',
         padding: '0 4px 0 4px',
         borderRadius: '2px',
-        marginRight: '2px'
+        marginRight: '2px',
+        marginTop: '2px',
+        cursor: 'pointer'
     }
     if (line.startsWith('U')) {
         style.backgroundColor = 'blue'

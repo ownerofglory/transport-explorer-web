@@ -54,7 +54,7 @@ function MapController() {
         setFilters(prevFilters => {
             const newFilters = { ...prevFilters, [type]: checked };
             updateQueryParams(newFilters, null)  // Clear the line parameter
-            return newFilters
+            return newFilters;
         })
     }
 
@@ -92,18 +92,9 @@ function MapController() {
                 "Zacke": false
             });
             setFilters(initialFilters);
-            setSelectedLine(null);  // Clear selected line if transport types are present
         }
         if (line) {
             setSelectedLine(line);
-            setFilters({
-                "U-Bahn": false,
-                "S-Bahn": false,
-                "Bus": false,
-                "Trains": false,
-                "Cablecar": false,
-                "Zacke": false
-            });  // Clear all filters if a line is selected
         }
     }, [location.search]);
 
@@ -253,7 +244,7 @@ function MapController() {
                 )}
                 <div>
                     {transportLines.filter(line => {
-                        const name: any = line.properties?.textEfa ?? ''
+                        const name: string = line.properties?.textEfa ?? ''
 
                         if (selectedLine) return name === selectedLine;
 
@@ -261,7 +252,7 @@ function MapController() {
                             return true;
                         } else if (name.startsWith('S') && filters['S-Bahn']) {
                             return true;
-                        } else if (filters['Bus'] && ( !isNaN(Number(name)) || name.startsWith('N') || name.startsWith('SEV') || name.startsWith('X') )) {
+                        } else if (filters['Bus'] && (!isNaN(Number(name)) || name.startsWith('N') || name.startsWith('SEV') || name.startsWith('X') )) {
                             return true;
                         } else if ((name.startsWith('R') || name.startsWith('IR') || name.startsWith('IC') || name.startsWith('MEX')) && filters['Trains']) {
                             return true;
