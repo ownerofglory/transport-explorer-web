@@ -23,7 +23,7 @@ function TransportTypeControl({ position = 'topright', onToggle, filters }: Tran
                     const checkbox = DomUtil.create('input', 'checkbox') as HTMLInputElement;
                     checkbox.type = 'checkbox';
                     checkbox.id = type;
-                    checkbox.checked = filters[type];
+                    checkbox.checked = filters[type];  // Set checkbox state based on filters prop
                     checkbox.onchange = (e: Event) => {
                         const target = e.target as HTMLInputElement;
                         onToggle(type, target.checked);
@@ -57,7 +57,7 @@ function TransportTypeControl({ position = 'topright', onToggle, filters }: Tran
         };
     }, [map, position, filters, onToggle]);
 
-    return null;
+    return <div></div>;
 }
 
 export default TransportTypeControl;

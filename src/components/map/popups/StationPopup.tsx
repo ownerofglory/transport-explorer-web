@@ -3,8 +3,9 @@ import {useEffect} from "react";
 
 interface StationPopupProps {
     station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
+    onLineClick: (line: string) => void
 }
-function StationPopup({station}: StationPopupProps) {
+function StationPopup({station, onLineClick}: StationPopupProps) {
     const [lng, lat] = (station.geometry as GeoJSON.Point).coordinates
     useEffect(() => {
 
@@ -12,7 +13,7 @@ function StationPopup({station}: StationPopupProps) {
 
     const formattedLines = station.properties?.linesEFA.map((line: string) => {
         const style = getLineStyle(line);
-        return (<span key={line} style={style}>{line}</span>);
+        return (<span key={line} onClick={() => onLineClick(line)} style={style}>{line}</span>);
     });
 
     return (
@@ -38,7 +39,10 @@ function getLineStyle(line: any) {
         style.backgroundColor = 'blue'
     } else if (line.startsWith('S')) {
         style.backgroundColor = 'green'
-    } else if (!isNaN(line) || line.startsWith('N') || line.startsWith('SEV')) {
+    } else if (line === '10' || line === '20') {
+        style.backgroundColor = 'yellow'
+        style.color = 'black'
+    } else if (!isNaN(Number(line)) || line.startsWith('N') || line.startsWith('SEV') || line.startsWith('X')) {
         style.backgroundColor = 'red'
     } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
         style.backgroundColor = 'gray'
