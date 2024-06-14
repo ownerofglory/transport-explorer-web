@@ -1,14 +1,15 @@
-import {Control, ControlPosition, DomUtil} from "leaflet";
-import {useMap} from "react-leaflet";
-import {useEffect} from "react";
+import { Control, ControlPosition, DomUtil } from "leaflet";
+import { useMap } from "react-leaflet";
+import { useEffect } from "react";
 
 interface TransportTypeControlProps {
-    position?: ControlPosition
+    position?: ControlPosition;
+    filters: { [key: string]: boolean };
     onToggle: (type: string, checked: boolean) => void;
 }
 
-function TransportTypeControl({position = 'topright', onToggle}: TransportTypeControlProps) {
-    const map = useMap()
+function TransportTypeControl({ position = 'topright', onToggle, filters }: TransportTypeControlProps) {
+    const map = useMap();
 
     useEffect(() => {
         const transTypeControl = Control.extend({
@@ -22,6 +23,7 @@ function TransportTypeControl({position = 'topright', onToggle}: TransportTypeCo
                     const checkbox = DomUtil.create('input', 'checkbox') as HTMLInputElement;
                     checkbox.type = 'checkbox';
                     checkbox.id = type;
+                    checkbox.checked = filters[type];
                     checkbox.onchange = (e: Event) => {
                         const target = e.target as HTMLInputElement;
                         onToggle(type, target.checked);
@@ -45,17 +47,17 @@ function TransportTypeControl({position = 'topright', onToggle}: TransportTypeCo
 
                 return container;
             }
-        })
+        });
 
         const control = new transTypeControl({ position });
         map.addControl(control);
 
         return () => {
             map.removeControl(control);
-        }
-    }, [map, position]);
+        };
+    }, [map, position, filters, onToggle]);
 
-    return (<div></div>)
+    return null;
 }
 
-export default TransportTypeControl
+export default TransportTypeControl;

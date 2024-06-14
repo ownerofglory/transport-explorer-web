@@ -13,13 +13,25 @@ import StationPopup from "./popups/StationPopup.tsx";
 import TransportLine from "./lines/TransportLine.tsx";
 import ErrorBoundary from "../error/ErrorBoundary.tsx";
 import TransportTypeControl from "./controls/TransportTypeControl.tsx";
+import {useLocation, useNavigate} from "react-router-dom";
+
+type TransportFilters = {
+    "U-Bahn": boolean;
+    "S-Bahn": boolean;
+    "Bus": boolean;
+    "Trains": boolean;
+    "Cablecar": boolean;
+    "Zacke": boolean;
+};
 
 function MapController() {
     console.log('render', 'MapController');
+    const location = useLocation();
+    const navigate = useNavigate();
     const [zoomLvl, setZoomLvl] = useState(12);
     const map = useMap();
     const [chosenStation, setChosenStation] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>();
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<TransportFilters>({
         "U-Bahn": false,
         "S-Bahn": false,
         "Bus": false,
@@ -34,9 +46,38 @@ function MapController() {
     }, []);
 
     const handleToggle = (type: string, checked: boolean) => {
-        console.log(filters)
-        setFilters(prevFilters => ({ ...prevFilters, [type]: checked }));
+        setFilters(prevFilters => {
+            const newFilters = { ...prevFilters, [type]: checked };
+            updateQueryParams(newFilters);
+            return newFilters;
+        });
     };
+
+    const updateQueryParams = (filters: { [key: string]: boolean }) => {
+        const activeFilters = Object.keys(filters).filter(key => filters[key]);
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set('transportType', activeFilters.join(','));
+        navigate({ search: searchParams.toString() });
+    };
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const transportType = searchParams.get('transportType');
+        if (transportType) {
+            const initialFilters = transportType.split(',').reduce((acc, type) => {
+                acc[type as keyof TransportFilters] = true;
+                return acc;
+            }, {
+                "U-Bahn": false,
+                "S-Bahn": false,
+                "Bus": false,
+                "Trains": false,
+                "Cablecar": false,
+                "Zacke": false
+            });
+            setFilters(initialFilters);
+        }
+    }, [location.search]);
 
     useEffect(() => {
         const onZoomEnd = () => {
@@ -123,7 +164,7 @@ function MapController() {
     return (
         <ErrorBoundary>
             <LayersControl>
-                <TransportTypeControl onToggle={handleToggle}/>
+                <TransportTypeControl onToggle={handleToggle} filters={filters}/>
                 {zoomLvl >= 12 && (
                     <div key={'stations'}>
                         {filters['U-Bahn'] ? ubahnStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
