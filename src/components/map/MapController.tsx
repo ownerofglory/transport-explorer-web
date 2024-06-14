@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { LayersControl, useMap } from "react-leaflet";
 import lines from "../../../data/lines.json";
 import stations from "../../../data/stations.json";
@@ -7,13 +8,13 @@ import rbahnIcon from "../../assets/r-bahn-icon.png";
 import busIcon from "../../assets/bus-icon.png";
 import zackeIcon from "../../assets/zacke-icon.png";
 import cableCarIcon from "../../assets/cablecar-icon.png";
-import { useState, useEffect, useMemo, useCallback } from "react";
 import StationMarker from "./markers/StationMarker.tsx";
 import StationPopup from "./popups/StationPopup.tsx";
 import TransportLine from "./lines/TransportLine.tsx";
 import ErrorBoundary from "../error/ErrorBoundary.tsx";
 import TransportTypeControl from "./controls/TransportTypeControl.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
+import LinePopup from "./popups/LinePopup.tsx";
 
 type TransportFilters = {
     "U-Bahn": boolean;
@@ -40,25 +41,28 @@ function MapController() {
         "Zacke": false
     });
     const [selectedLine, setSelectedLine] = useState<string | null>(null);
-    const handleLineClick = (line: string) => {
+
+    const handleLineClick = useCallback((line: string) => {
         setSelectedLine(line);
         updateQueryParams(filters, line);
-    };
+    }, [filters]);
+
     const handleStationChosen = useCallback((station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
         console.log('chosen', station);
+        setSelectedLine(null);
         setChosenStation(station);
     }, []);
 
-    const handleToggle = (type: string, checked: boolean) => {
-        setSelectedLine(null)  // Clear the selected line when toggling transport types
+    const handleToggle = useCallback((type: string, checked: boolean) => {
+        setSelectedLine(null);  // Clear the selected line when toggling transport types
         setFilters(prevFilters => {
             const newFilters = { ...prevFilters, [type]: checked };
-            updateQueryParams(newFilters, null)  // Clear the line parameter
+            updateQueryParams(newFilters, null);  // Clear the line parameter
             return newFilters;
-        })
-    }
+        });
+    }, []);
 
-    const updateQueryParams = (filters: { [key: string]: boolean }, line: string | null) => {
+    const updateQueryParams = useCallback((filters: { [key: string]: boolean }, line: string | null) => {
         const activeFilters = Object.keys(filters).filter(key => filters[key]);
         const searchParams = new URLSearchParams(location.search);
         if (activeFilters.length > 0) {
@@ -72,8 +76,8 @@ function MapController() {
         } else {
             searchParams.delete('line');
         }
-        navigate({ search: searchParams.toString() });
-    }
+        navigate({ search: searchParams.toString() }, { replace: true });
+    }, [location.search, navigate]);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -202,7 +206,6 @@ function MapController() {
         return '';
     };
 
-
     return (
         <ErrorBoundary>
             <LayersControl>
@@ -242,8 +245,11 @@ function MapController() {
                 {chosenStation && (
                     <StationPopup station={chosenStation} onLineClick={handleLineClick}></StationPopup>
                 )}
+                {selectedLine && (
+                    <LinePopup coords={chosenStation?.geometry as GeoJSON.Point} line={transportLines.find(line => line.properties?.textEfa === selectedLine)!} />
+                )}
                 <div>
-                    {transportLines.filter(line => {
+                    {zoomLvl >= 10 && transportLines.filter(line => {
                         const name: string = line.properties?.textEfa ?? ''
 
                         if (selectedLine) return name === selectedLine;
@@ -266,7 +272,6 @@ function MapController() {
                         <TransportLine key={line.properties?.id} line={line} />
                     ))}
                 </div>
-
             </LayersControl>
         </ErrorBoundary>
     );
