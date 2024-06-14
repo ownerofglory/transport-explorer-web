@@ -1,121 +1,180 @@
-import {LayersControl, useMap} from "react-leaflet";
+import { LayersControl, useMap } from "react-leaflet";
 import lines from "../../../data/lines.json";
 import stations from "../../../data/stations.json";
-import ubahnIcon from "../../assets/u-bahn-icon.jpg";
+import ubahnIcon from "../../assets/u-bahn-icon.png";
 import sbahnIcon from "../../assets/s-bahn-icon.png";
-import {useState} from "react";
+import rbahnIcon from "../../assets/r-bahn-icon.png";
+import busIcon from "../../assets/bus-icon.png";
+import zackeIcon from "../../assets/zacke-icon.png";
+import cableCarIcon from "../../assets/cablecar-icon.png";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import StationMarker from "./markers/StationMarker.tsx";
 import StationPopup from "./popups/StationPopup.tsx";
 import TransportLine from "./lines/TransportLine.tsx";
 import ErrorBoundary from "../error/ErrorBoundary.tsx";
+import TransportTypeControl from "./controls/TransportTypeControl.tsx";
 
 function MapController() {
-    console.log('render', 'MapController')
-    const [zoomLvl, setZoomLvl] = useState(12)
-    const map = useMap()
-    const [chosenStation, setChosenStation] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>()
+    console.log('render', 'MapController');
+    const [zoomLvl, setZoomLvl] = useState(12);
+    const map = useMap();
+    const [chosenStation, setChosenStation] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>();
+    const [filters, setFilters] = useState({
+        "U-Bahn": false,
+        "S-Bahn": false,
+        "Bus": false,
+        "Trains": false,
+        "Cablecar": false,
+        "Zacke": false
+    });
 
-    const handleStationChosen = (station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
-        console.log('chosen', station)
-        setChosenStation(station)
-    }
+    const handleStationChosen = useCallback((station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
+        console.log('chosen', station);
+        setChosenStation(station);
+    }, []);
 
-    map.addEventListener('zoomend', () => {
-        console.log(map.getZoom())
-        setZoomLvl(map.getZoom())
-    })
+    const handleToggle = (type: string, checked: boolean) => {
+        console.log(filters)
+        setFilters(prevFilters => ({ ...prevFilters, [type]: checked }));
+    };
 
-    // const ubahnLines = (lines as GeoJSON.FeatureCollection)
-    //     .features
-    //     .filter(f => f.properties?.text.indexOf('U') == 0)
-    //
-    // const sbahnLines = (lines as GeoJSON.FeatureCollection)
-    //     .features
-    //     .filter(f => f.properties?.text.indexOf('S') == 0)
+    useEffect(() => {
+        const onZoomEnd = () => {
+            console.log(map.getZoom());
+            setZoomLvl(map.getZoom());
+        };
+        map.on('zoomend', onZoomEnd);
+        return () => {
+            map.off('zoomend', onZoomEnd);
+        };
+    }, [map]);
 
-    const ubahnStations = (stations as GeoJSON.FeatureCollection)
-        .features
-        .filter(f => f.properties?.transportModes.includes('Stadtbahn'))
-        .map(f => {
-            const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+    const ubahnStations = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('Stadtbahn'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-            (f.geometry as GeoJSON.Point).coordinates = [lon, lat]
+    const sbahnStations = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('S-Bahn'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-            return f
-        })
+    const trainStations = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('R-Bahn'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-    const sbahnStations = (stations as GeoJSON.FeatureCollection)
-        .features
-        .filter(f => f.properties?.transportModes.includes('S-Bahn'))
-        .map(f => {
-            const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+    const zackeStations = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('Zahnradbahn'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-            (f.geometry as GeoJSON.Point).coordinates = [lon, lat]
+    const cableCarStations = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('Seilbahn'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-            return f
-        })
+    const busStops = useMemo(() => (
+        (stations as GeoJSON.FeatureCollection)
+            .features
+            .filter(f => f.properties?.transportModes.includes('Bus') || f.properties?.transportModes.includes('Nachtbus'))
+            .map(f => {
+                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+                return f;
+            })
+    ), []);
 
-    // geoJSON(ubahnLines).addTo(map)
-    // sbahnLines.forEach(s => {
-    //     const geom = (s as GeoJSON.Feature).geometry
-    //     const coords = (geom as GeoJSON.MultiLineString).coordinates
-    //     const latLngCoords: LatLngExpression[][] = coords.map(line =>
-    //         line.map(position => [position[1], position[0]] as LatLngExpression)
-    //     );
-    //
-    //     const sline = polyline(latLngCoords, {
-    //         color: '#27B611'
-    //     })
-    //     sline.addTo(map)
-    // })
+    const transportLines = useMemo(() => (
+        (lines as GeoJSON.FeatureCollection).features
+    ), []);
+
 
     return (
         <ErrorBoundary>
             <LayersControl>
-                {
-                    (zoomLvl >= 12) ?
-                        (
-                            <div key={'stations'}>
-                                {
-                                    ubahnStations.map((f:  GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
-                                        return (
-                                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={ubahnIcon}>
-                                            </StationMarker>
-                                        )
-                                    })
-                                }
-
-                                {
-                                    sbahnStations.map((f:  GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
-                                        return (
-                                            <StationMarker onClick={handleStationChosen} station={f} iconUrl={sbahnIcon}>
-                                            </StationMarker>
-                                        )
-                                    })
-                                }
-                            </div>
-                        ) :
-                        (<></>)
-                }
-                {
-                    chosenStation ? (
-                        <StationPopup station={chosenStation}></StationPopup>
-                    ):(<></>)
-                }
-
+                <TransportTypeControl onToggle={handleToggle}/>
+                {zoomLvl >= 12 && (
+                    <div key={'stations'}>
+                        {filters['U-Bahn'] ? ubahnStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={ubahnIcon} />
+                        )) : (<></>)}
+                        {filters['S-Bahn'] ? sbahnStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={sbahnIcon} />
+                        )) : (<></>)}
+                        {filters['Trains'] ? trainStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={rbahnIcon} />
+                        )) : (<></>)}
+                        {filters['Zacke'] ? zackeStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={zackeIcon} />
+                        )) : (<></>)}
+                        {filters['Cablecar'] ? cableCarStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={cableCarIcon} />
+                        )) : (<></>)}
+                        {filters['Bus'] ? busStops.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
+                            <StationMarker key={f.properties?.globalId} onClick={handleStationChosen} station={f} iconUrl={busIcon} />
+                        )) : (<></>)}
+                    </div>
+                )}
+                {chosenStation && (
+                    <StationPopup station={chosenStation}></StationPopup>
+                )}
                 <div>
-                    {
-                        (lines as GeoJSON.FeatureCollection)
-                            .features
-                            .map(line => {
+                    {transportLines.filter(line => {
+                        const name: any = line.properties?.textEfa ?? ''
 
-                                return <TransportLine line={line}></TransportLine>
-                            })
-                    }
+                        if (name.startsWith('U') && filters['U-Bahn']) {
+                            return true;
+                        } else if (name.startsWith('S') && filters['S-Bahn']) {
+                            return true;
+                        } else if (filters['Bus'] && ( !isNaN(Number(name)) || name.startsWith('N') || name.startsWith('SEV') || name.startsWith('X') )) {
+                            return true;
+                        } else if ((name.startsWith('R') || name.startsWith('IR') || name.startsWith('IC') || name.startsWith('MEX')) && filters['Trains']) {
+                            return true;
+                        } else if ((name == '10') && filters['Zacke']) {
+                            return true;
+                        } else if ((name == '20') && filters['Cablecar']) {
+                            return true;
+                        }
+                        return false
+                    }).map(line => (
+                        <TransportLine key={line.properties?.id} line={line} />
+                    ))}
                 </div>
+
             </LayersControl>
         </ErrorBoundary>
-    )
+    );
 }
 
-export default MapController
+export default MapController;

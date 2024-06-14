@@ -51,15 +51,21 @@ function TransportLine({line}: TransportLineProps) {
 }
 
 function getLineColor(line: any): string {
-    if (line.startsWith('U')) {
-        return 'blue'
-    } else if (line.startsWith('S')) {
-        return 'green'
-    } else if (!isNaN(line) || line.startsWith('N') || line.startsWith('SEV') || line.startsWith('X')) {
-        return 'red'
-    } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
-        return 'gray'
+    if (typeof line !== 'string') {
+        return 'white'; // default color if the line is not a string
     }
-    return  'white'
+
+    if (line.startsWith('U')) {
+        return 'blue';
+    } else if (line.startsWith('S')) {
+        return 'green';
+    } else if (line === '10' || line === '20') {
+        return 'yellow';
+    } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
+        return 'gray';
+    } else if (!isNaN(Number(line)) || line.startsWith('N') || line.startsWith('SEV') || line.startsWith('X')) {
+        return 'red';
+    }
+    return 'white';
 }
 export default TransportLine
