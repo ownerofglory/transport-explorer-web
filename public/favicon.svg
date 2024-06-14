@@ -1,16 +1,16 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g clip-path="url(#clip0_47_68)">
-<rect width="32" height="32" rx="1.6" fill="white"/>
-<rect x="5.68018" y="0.638672" width="30.66" height="30.72" fill="url(#pattern0_47_68)"/>
-<rect x="3.34033" y="27.6797" width="29.56" height="3.68" fill="white"/>
-<rect x="2.78027" y="12.5195" width="22.76" height="20.48" fill="url(#pattern1_47_68)"/>
+<rect width="32" height="32" rx="1.6" fill="#FF8906"/>
+<rect x="9" y="1" width="32" height="32" fill="url(#pattern0_47_68)"/>
+<rect x="3" y="27" width="30" height="5" fill="#FF8906"/>
+<rect y="6" width="31" height="26" fill="url(#pattern1_47_68)"/>
 </g>
 <defs>
 <pattern id="pattern0_47_68" patternContentUnits="objectBoundingBox" width="1" height="1">
-<use xlink:href="#image0_47_68" transform="scale(0.00195695 0.00195313)"/>
+<use xlink:href="#image0_47_68" transform="translate(0 -0.000978474) scale(0.00195695)"/>
 </pattern>
 <pattern id="pattern1_47_68" patternContentUnits="objectBoundingBox" width="1" height="1">
-<use xlink:href="#image1_47_68" transform="scale(0.000878735 0.000976562)"/>
+<use xlink:href="#image1_47_68" transform="matrix(0.000878735 0 0 0.00104772 0 -0.0364337)"/>
 </pattern>
 <clipPath id="clip0_47_68">
 <rect width="32" height="32" rx="1.6" fill="white"/>
