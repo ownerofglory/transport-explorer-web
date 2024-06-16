@@ -1,4 +1,4 @@
-import { Popup } from "react-leaflet";
+import {Popup} from "react-leaflet";
 import lines from '../../../../data/line_names.json'
 
 interface LinePopupProps {
@@ -10,20 +10,14 @@ type LineInfo = {     type: string;     features: {         type: string;       
 
 function LinePopup({ line, coords }: LinePopupProps) {
     const [lng, lat] = coords.coordinates;
-    console.log(lng, lat)
-
     const lineInfo = (lines as LineInfo).features.find(f => f.properties.lineName === line.properties?.textEfa);
-
     if (!lineInfo) {
         return null;
     }
-    console.log(lineInfo)
 
     const lineName = line.properties?.textEfa || '';
     const terminalStations = lineInfo.properties?.headline;
 
-    // const latLng: LatLngExpression = {lat, lng}
-    console.log('Opening popup at:', [lng, lat])
 
     return (
         <Popup position={[lng, lat]}>

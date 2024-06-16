@@ -1,15 +1,23 @@
-import {Popup} from "react-leaflet";
-import {useEffect} from "react";
+import {Popup, useMapEvent} from "react-leaflet";
+import {useEffect, useRef} from "react";
+import {Popup as LeafletPopup} from "leaflet";
 
 interface StationPopupProps {
     station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
     onLineClick: (line: string) => void
+    onPopupClose: () => void
 }
-function StationPopup({station, onLineClick}: StationPopupProps) {
+function StationPopup({station, onLineClick, onPopupClose}: StationPopupProps) {
     const [lng, lat] = (station.geometry as GeoJSON.Point).coordinates
     useEffect(() => {
 
     }, [station]);
+    const popupRef = useRef<LeafletPopup>(null);
+    useMapEvent('popupclose', () => {
+        if (popupRef.current) {
+            onPopupClose()
+        }
+    });
 
     const formattedLines = station.properties?.linesEFA.map((line: string) => {
         const style = getLineStyle(line);
@@ -17,7 +25,7 @@ function StationPopup({station, onLineClick}: StationPopupProps) {
     });
 
     return (
-        <Popup position={[lng, lat]}>
+        <Popup interactive ref={popupRef} position={[lng, lat]}>
             <div style={{maxWidth: '250px'}}>
                 <h3><strong>{station.properties?.name}</strong></h3>
                 <p><strong>Lines:</strong></p>
