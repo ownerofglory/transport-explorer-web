@@ -42,7 +42,6 @@ function StationMarker({station, iconUrl, children, onClick}: StationProps) {
                 <Tooltip key={'t' + station.properties?.globalId} position={[lng, lat]}>
                     {station.properties?.name}
                 </Tooltip>
-                <p>Overlay</p>
                 {children}
             </Marker>
         </div>
