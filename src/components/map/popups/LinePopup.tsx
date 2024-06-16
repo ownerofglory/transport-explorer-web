@@ -10,17 +10,23 @@ type LineInfo = {     type: string;     features: {         type: string;       
 
 function LinePopup({ line, coords }: LinePopupProps) {
     const [lng, lat] = coords.coordinates;
+    console.log(lng, lat)
 
-    const lineInfo = (lines as LineInfo).features
-        .filter(f => f.properties.lineName == line.properties?.textEfa)[0]
+    const lineInfo = (lines as LineInfo).features.find(f => f.properties.lineName === line.properties?.textEfa);
 
+    if (!lineInfo) {
+        return null;
+    }
     console.log(lineInfo)
 
     const lineName = line.properties?.textEfa || '';
     const terminalStations = lineInfo.properties?.headline;
 
+    // const latLng: LatLngExpression = {lat, lng}
+    console.log('Opening popup at:', [lng, lat])
+
     return (
-        <Popup position={{lng, lat}}>
+        <Popup position={[lng, lat]}>
             <div>
                 <h3><span style={getLineStyle(lineName)}>{lineName}</span></h3>
                 <p><strong>Heading:</strong> {terminalStations}</p>

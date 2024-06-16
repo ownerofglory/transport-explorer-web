@@ -31,7 +31,7 @@ function MapController() {
     const navigate = useNavigate();
     const [zoomLvl, setZoomLvl] = useState(12);
     const map = useMap();
-    const [chosenStation, setChosenStation] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>();
+    const [chosenStation, setChosenStation] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | null>(null);
     const [filters, setFilters] = useState<TransportFilters>({
         "U-Bahn": false,
         "S-Bahn": false,
@@ -117,66 +117,66 @@ function MapController() {
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('Stadtbahn'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const sbahnStations = useMemo(() => (
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('S-Bahn'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const trainStations = useMemo(() => (
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('R-Bahn'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const zackeStations = useMemo(() => (
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('Zahnradbahn'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const cableCarStations = useMemo(() => (
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('Seilbahn'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const busStops = useMemo(() => (
         (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.transportModes.includes('Bus') || f.properties?.transportModes.includes('Nachtbus'))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            })
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // })
     ), []);
 
     const transportLines = useMemo(() => (
@@ -188,12 +188,14 @@ function MapController() {
         return (stations as GeoJSON.FeatureCollection)
             .features
             .filter(f => f.properties?.linesEFA.includes(selectedLine))
-            .map(f => {
-                const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
-                (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
-                return f;
-            });
+            // .map(f => {
+            //     const [lat, lon] = (f.geometry as GeoJSON.Point).coordinates;
+            //     (f.geometry as GeoJSON.Point).coordinates = [lon, lat];
+            //     return f;
+            // });
     }, [selectedLine]);
+
+    console.table(filteredStations)
 
     const getIconForStation = (station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
         const transportModes = station.properties?.transportModes || [];
@@ -246,7 +248,7 @@ function MapController() {
                     <StationPopup station={chosenStation} onLineClick={handleLineClick}></StationPopup>
                 )}
                 {selectedLine && (
-                    <LinePopup coords={chosenStation?.geometry as GeoJSON.Point} line={transportLines.find(line => line.properties?.textEfa === selectedLine)!} />
+                    <LinePopup coords={filteredStations[0]?.geometry as GeoJSON.Point} line={transportLines.find(line => line.properties?.textEfa === selectedLine)!} />
                 )}
                 <div>
                     {zoomLvl >= 10 && transportLines.filter(line => {
