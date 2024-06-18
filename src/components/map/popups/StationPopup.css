@@ -1,0 +1,35 @@
+.departures-board {
+    display: flex;
+    flex-direction: column;
+    background-color: #333;
+    color: #ff9900;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.departure-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.departure-item span {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.line {
+    flex: 1;
+}
+
+.direction {
+    flex: 2;
+    text-align: left;
+}
+
+.countdown {
+    flex: 1;
+    text-align: right;
+}

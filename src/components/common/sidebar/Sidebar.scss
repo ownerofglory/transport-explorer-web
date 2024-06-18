@@ -1,0 +1,35 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Sidebar is hidden initially */
+  width: 300px;
+  height: 100%;
+  background-color: #eeeeee;
+  color: #3b3b3b;
+  transition: left 0.3s;
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+.sidebar.open {
+  left: 0; /* Slide the sidebar into view */
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.close-button {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #3b3b3b;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #000000;
+}

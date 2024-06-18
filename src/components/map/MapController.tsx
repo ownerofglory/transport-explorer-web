@@ -15,6 +15,10 @@ import ErrorBoundary from "../error/ErrorBoundary.tsx";
 import TransportTypeControl from "./controls/TransportTypeControl.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import LinePopup from "./popups/LinePopup.tsx";
+import Sidebar from "../common/sidebar/Sidebar.tsx";
+import SearchBarControl from "./controls/SearchBarControl.tsx";
+import {RouteSearchEvent} from "../../events/route.ts";
+import RouteSearchPane from "../route-search/RouteSearchPane.tsx";
 
 type TransportFilters = {
     "U-Bahn": boolean;
@@ -41,6 +45,32 @@ function MapController() {
         "Zacke": false
     });
     const [selectedLine, setSelectedLine] = useState<string | null>(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [routeSearch, setRouteSearch] = useState<RouteSearchEvent | null>(null)
+    const handleRouteSearch = (event: RouteSearchEvent) => {
+        console.log(event)
+        setRouteSearch((prevRouteSearch) => {
+            const newRouteSearch: RouteSearchEvent = {
+                ...prevRouteSearch,
+            };
+            if (event.stationTo) {
+                newRouteSearch.stationTo = event.stationTo
+            }
+            if (event.stationFrom) {
+                newRouteSearch.stationFrom = event.stationFrom
+            }
+            if (event.dateTime) {
+                newRouteSearch.dateTime = event.dateTime
+            }
+            return newRouteSearch;
+        });
+        setSidebarOpen(true)
+    }
+
+    const handleSidebarClose = () => {
+        setRouteSearch(null)
+        setSidebarOpen(false)
+    }
 
     const handleLineClick = useCallback((line: string) => {
         setSelectedLine(line);
@@ -238,6 +268,7 @@ function MapController() {
                     <StationPopup station={chosenStation}
                                   onLineClick={handleLineClick}
                                   onPopupClose={handleStationPopupClose}
+                                  onRouteSearch={handleRouteSearch}
                     ></StationPopup>
                 )}
                 {selectedLine && (
@@ -270,6 +301,14 @@ function MapController() {
                     ))}
                 </div>
             </LayersControl>
+            <SearchBarControl position={'topleft'} onSearch={() => {}}/>
+            <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose}>
+                {routeSearch && (
+                    <RouteSearchPane from={routeSearch.stationFrom}
+                                     to={routeSearch.stationTo}
+                    ></RouteSearchPane>
+                )}
+            </Sidebar>
         </ErrorBoundary>
     );
 }
