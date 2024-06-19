@@ -19,6 +19,62 @@ import Sidebar from "../common/sidebar/Sidebar.tsx";
 import SearchBarControl from "./controls/SearchBarControl.tsx";
 import {RouteSearchEvent} from "../../events/route.ts";
 import RouteSearchPane from "../route-search/RouteSearchPane.tsx";
+import {JourneyItem} from "../../models/journey.ts";
+
+function convertJourneyItemToGeoJSON(journeyItem: JourneyItem): GeoJSON.FeatureCollection {
+    const features: GeoJSON.Feature[] = [];
+
+    journeyItem.routeLegs?.forEach((leg, index) => {
+        const coordinates: number[][] = leg.coords?.map(coord => [coord.lat, coord.lng]) || [];
+        if (coordinates.length > 0) {
+            features.push({
+                type: "Feature",
+                properties: {
+                    id: index,
+                    line: leg.transportLine,
+                    dir: leg.origName + " - " + leg.dstName,
+                    text: leg.transportLine,
+                    textEfa: leg.transportLine,
+                    title: leg.transportLineDestination,
+                    validFrom: leg.departureTimePlan ?? '',
+                    operator: leg.transportService
+                },
+                geometry: {
+                    type: "MultiLineString",
+                    coordinates: [coordinates]
+                }
+            });
+        }
+    });
+
+    return {
+        type: "FeatureCollection",
+        features
+    };
+}
+
+
+function collectStationsFromRoute(journeyItem: JourneyItem): GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[] {
+    const collectedStations: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[] = [];
+    const stationIds = new Set<string>();
+
+    journeyItem.routeLegs?.forEach((leg) => {
+        leg.stopSequence?.forEach((stop) => {
+            if (stop.globalId) {
+                const globalIdParts = stop.globalId.split(':').slice(0, 3).join(':');
+                if (!stationIds.has(globalIdParts)) {
+                    const stationFeature = (stations as GeoJSON.FeatureCollection).features.find(f => f.properties?.globalId.split(':').slice(0, 3).join(':') === globalIdParts);
+                    if (stationFeature) {
+                        collectedStations.push(stationFeature);
+                        stationIds.add(globalIdParts);
+                    }
+                }
+            }
+        });
+    });
+
+    return collectedStations;
+}
 
 type TransportFilters = {
     "U-Bahn": boolean;
@@ -47,6 +103,20 @@ function MapController() {
     const [selectedLine, setSelectedLine] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [routeSearch, setRouteSearch] = useState<RouteSearchEvent | null>(null)
+    const [selectedRoute, setSelectedRoute] = useState<JourneyItem | null>(null)
+    const [routeLines, setRouteLines] = useState<GeoJSON.FeatureCollection | null>(null)
+    const [routeStations, setRouteStations] = useState<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[] | null>(null);
+
+
+    const handleRouteSelected = (route: JourneyItem) => {
+        setSelectedRoute(route);
+        const routeLines = convertJourneyItemToGeoJSON(route);
+        setRouteLines(routeLines);
+        const routeStations = collectStationsFromRoute(route);
+        setRouteStations(routeStations);
+        console.log(route, routeStations)
+    }
+
     const handleRouteSearch = (event: RouteSearchEvent) => {
         console.log(event)
         setRouteSearch((prevRouteSearch) => {
@@ -65,6 +135,7 @@ function MapController() {
             return newRouteSearch;
         });
         setSidebarOpen(true)
+        setSelectedLine(null);
     }
 
     const handleSidebarClose = () => {
@@ -74,10 +145,16 @@ function MapController() {
 
     const handleLineClick = useCallback((line: string) => {
         setSelectedLine(line);
+        setSelectedRoute(null)
+        setRouteLines(null)
         updateQueryParams(filters, line);
     }, [filters]);
 
-    const handleStationPopupClose = () => setChosenStation(null)
+    const handleStationPopupClose = () => {
+        setChosenStation(null)
+        setSelectedRoute(null)
+        setRouteLines(null)
+    }
 
     const handleStationChosen = useCallback((station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => {
         console.log('chosen', station);
@@ -87,6 +164,8 @@ function MapController() {
 
     const handleToggle = useCallback((type: string, checked: boolean) => {
         setSelectedLine(null);  // Clear the selected line when toggling transport types
+        setSelectedRoute(null)
+        setRouteLines(null)
         setFilters(prevFilters => {
             const newFilters = { ...prevFilters, [type]: checked };
             updateQueryParams(newFilters, null);  // Clear the line parameter
@@ -209,7 +288,7 @@ function MapController() {
         <ErrorBoundary>
             <LayersControl>
                 <TransportTypeControl onToggle={handleToggle} filters={filters}/>
-                {zoomLvl >= 12 && (
+                {zoomLvl >= 12 && !selectedRoute &&  (
                     <div key={'stations'}>
                         {selectedLine ? (
                             filteredStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
@@ -232,31 +311,31 @@ function MapController() {
                                     <StationMarker key={f.properties?.globalId}
                                                    onClick={handleStationChosen}
                                                    station={f}
-                                                   iconUrl={sbahnIcon} />
+                                                   iconUrl={sbahnIcon}/>
                                 )) : (<></>)}
                                 {filters['Trains'] ? trainStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
                                     <StationMarker key={f.properties?.globalId}
                                                    onClick={handleStationChosen}
                                                    station={f}
-                                                   iconUrl={rbahnIcon} />
+                                                   iconUrl={rbahnIcon}/>
                                 )) : (<></>)}
                                 {filters['Zacke'] ? zackeStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
                                     <StationMarker key={f.properties?.globalId}
                                                    onClick={handleStationChosen}
                                                    station={f}
-                                                   iconUrl={zackeIcon} />
+                                                   iconUrl={zackeIcon}/>
                                 )) : (<></>)}
                                 {filters['Cablecar'] ? cableCarStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
                                     <StationMarker key={f.properties?.globalId}
                                                    onClick={handleStationChosen}
                                                    station={f}
-                                                   iconUrl={cableCarIcon} />
+                                                   iconUrl={cableCarIcon}/>
                                 )) : (<></>)}
                                 {filters['Bus'] ? busStops.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (
                                     <StationMarker key={f.properties?.globalId}
                                                    onClick={handleStationChosen}
                                                    station={f}
-                                                   iconUrl={busIcon} />
+                                                   iconUrl={busIcon}/>
                                 )) : (<></>)}
                             </>
                         )}
@@ -264,6 +343,13 @@ function MapController() {
 
                     </div>
                 )}
+                {routeStations && routeStations.map((station) => (
+                    <StationMarker key={station.properties?.globalId}
+                                   onClick={handleStationChosen}
+                                   station={station}
+                                   iconUrl={getIconForStation(station)}
+                    />
+                ))}
                 {chosenStation && (
                     <StationPopup station={chosenStation}
                                   onLineClick={handleLineClick}
@@ -277,7 +363,7 @@ function MapController() {
                     />
                 )}
                 <div>
-                    {zoomLvl >= 10 && transportLines.filter(line => {
+                    {zoomLvl >= 10 && !selectedRoute && transportLines.filter(line => {
                         const name: string = line.properties?.textEfa ?? ''
 
                         if (selectedLine) return name === selectedLine;
@@ -286,7 +372,7 @@ function MapController() {
                             return true;
                         } else if (name.startsWith('S') && filters['S-Bahn']) {
                             return true;
-                        } else if (filters['Bus'] && (!isNaN(Number(name)) || name.startsWith('N') || name.startsWith('SEV') || name.startsWith('X') )) {
+                        } else if (filters['Bus'] && (!isNaN(Number(name)) || name.startsWith('N') || name.startsWith('SEV') || name.startsWith('X'))) {
                             return true;
                         } else if ((name.startsWith('R') || name.startsWith('IR') || name.startsWith('IC') || name.startsWith('MEX')) && filters['Trains']) {
                             return true;
@@ -297,15 +383,21 @@ function MapController() {
                         }
                         return false
                     }).map(line => (
-                        <TransportLine key={line.properties?.id} line={line} />
+                        <TransportLine key={line.properties?.id} line={line}/>
+                    ))}
+
+                    {routeLines && routeLines.features.map((feature, index) => (
+                        <TransportLine key={index} line={feature}/>
                     ))}
                 </div>
             </LayersControl>
-            <SearchBarControl position={'topleft'} onSearch={() => {}}/>
+            <SearchBarControl position={'topleft'} onSearch={() => {
+            }}/>
             <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose}>
                 {routeSearch && (
                     <RouteSearchPane from={routeSearch.stationFrom}
                                      to={routeSearch.stationTo}
+                                     onRouteSelect={handleRouteSelected}
                     ></RouteSearchPane>
                 )}
             </Sidebar>
