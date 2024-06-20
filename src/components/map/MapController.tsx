@@ -141,6 +141,8 @@ function MapController() {
     const handleSidebarClose = () => {
         setRouteSearch(null)
         setSidebarOpen(false)
+        setRouteLines(null)
+        setRouteStations(null)
     }
 
     const handleLineClick = useCallback((line: string) => {
