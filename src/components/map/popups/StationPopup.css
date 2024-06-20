@@ -33,3 +33,19 @@
     flex: 1;
     text-align: right;
 }
+
+.button-row {
+    padding: 8px 0 8px 0;
+    display: flex;
+    width: 46%;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.button-row button {
+    border: none;
+    padding: 8px;
+    background-color: #dddddd;
+    color: #1a1919;
+    cursor: pointer;
+}

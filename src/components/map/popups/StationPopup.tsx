@@ -67,7 +67,7 @@ function StationPopup({station, onLineClick, onPopupClose, onRouteSearch}: Stati
                 <div style={{display: 'flex', flexWrap: 'wrap'}}>
                     {formattedLines}
                 </div>
-                <div>
+                <div className={'button-row'}>
                     <button onClick={buildRouteTo}>Route to here</button>
                     <button onClick={buildRouteFrom}>Route from here</button>
                 </div>
