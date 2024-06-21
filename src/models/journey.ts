@@ -6,7 +6,7 @@ export interface JourneyItem {
     routeLegs?: JourneyRouteLeg[];
 }
 
-interface JourneyRouteLeg {
+export interface JourneyRouteLeg {
     origName?: string;
     origId?: string;
     dstName?: string;
@@ -20,6 +20,7 @@ interface JourneyRouteLeg {
     transportLineDestination?: string;
     stopSequence?: RouteStop[];
     coords?: Coord[];
+    duration?: number;
 }
 
 interface RouteStop {

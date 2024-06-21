@@ -6,6 +6,7 @@ interface TransportLineProps {
 }
 
 function TransportLine({line}: TransportLineProps) {
+    console.log(line)
     if (!line.geometry || (line.geometry.type !== 'MultiLineString' && line.geometry.type !== 'LineString')) {
         console.error('Invalid geometry type:', line.geometry);
         return null;
@@ -45,7 +46,7 @@ function TransportLine({line}: TransportLineProps) {
     }
 
     return (
-        <Polyline key={line.properties?.id} positions={latLngCoords} color={getLineColor(line.properties?.textEfa)}>
+        <Polyline key={line.properties?.id} dashArray={line.properties?.textEfa ? undefined : '2, 2'} positions={latLngCoords} color={getLineColor(line.properties?.textEfa)}>
         </Polyline>
     )
 }
@@ -65,6 +66,8 @@ function getLineColor(line: any): string {
         return 'gray';
     } else if (!isNaN(Number(line)) || line.startsWith('N') || line.startsWith('SEV') || line.startsWith('X')) {
         return 'red';
+    } else if (line === '' || !line) {
+        return 'lightgray'
     }
     return 'white';
 }

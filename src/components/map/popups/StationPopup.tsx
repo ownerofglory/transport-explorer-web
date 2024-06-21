@@ -5,16 +5,18 @@ import Modal from "../../common/modal/Modal.tsx";
 import "./StationPopup.css";
 import StationArrivals from "../../../models/arrivals.ts";
 import {RouteSearchEvent} from "../../../events/route.ts";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faRightFromBracket, faRightToBracket} from "@fortawesome/free-solid-svg-icons";
 
 const backendUrl = "http://localhost:8080/api/v1/arrivals"
 
 interface StationPopupProps {
-    station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
-    onLineClick: (line: string) => void
-    onPopupClose: () => void
-    onRouteSearch: (event: RouteSearchEvent) => void
+    station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>,
+    onLineClick: (line: string) => void,
+    onPopupClose: () => void,
+    onRouteSearch: (event: RouteSearchEvent) => void,
 }
-function StationPopup({station, onLineClick, onPopupClose, onRouteSearch}: StationPopupProps) {
+function StationPopup({ station, onLineClick, onPopupClose, onRouteSearch }: StationPopupProps) {
     const popupRef = useRef<LeafletPopup>(null);
     const [arrivals, setArrivals] = useState<StationArrivals | null>(null);
 
@@ -68,8 +70,8 @@ function StationPopup({station, onLineClick, onPopupClose, onRouteSearch}: Stati
                     {formattedLines}
                 </div>
                 <div className={'button-row'}>
-                    <button onClick={buildRouteTo}>Route to here</button>
-                    <button onClick={buildRouteFrom}>Route from here</button>
+                    <button onClick={buildRouteTo}>Route to here <FontAwesomeIcon icon={faRightToBracket} /></button>
+                    <button onClick={buildRouteFrom}>Route from here <FontAwesomeIcon icon={faRightFromBracket} /></button>
                 </div>
                 <div className="departures-board">
                     {arrivals && arrivals?.arrivals && arrivals?.arrivals?.map((arr) => (

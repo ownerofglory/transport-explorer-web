@@ -37,7 +37,7 @@
 .button-row {
     padding: 8px 0 8px 0;
     display: flex;
-    width: 46%;
+    width: 54%;
     flex-direction: row;
     justify-content: space-between;
 }

@@ -1,6 +1,8 @@
 import {useState} from "react";
-import JourneyList, {JourneyItem} from "../../models/journey.ts";
+import JourneyList, {JourneyItem, JourneyRouteLeg} from "../../models/journey.ts";
 import './RouteSearchPane.scss'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faAngleRight, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
 
 interface RouteSearchProps {
     from?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
@@ -31,12 +33,32 @@ function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) 
             <div>
                 {routes?.journeys?.map(j => (
                     <p onClick={() => onRouteSelect(j)} className={'route-item'}>{j.routeLegs?.map(l => (
-                        <span style={getLineStyle(l.transportLine ?? '')}>{l.transportLine} </span>
-                    ))}</p>
+                        <span>
+                            <span style={getLineStyle(l.transportLine ?? 'walk')}>
+                                {l.transportLine ?? <FontAwesomeIcon color={'black'} icon={faPersonWalking}/>}
+                            </span>
+
+                            <FontAwesomeIcon className={'next-icon'} icon={faAngleRight}/>
+                        </span>
+                    ))}
+                        <span className={'route-duration'}>{formatDuration(j.routeLegs?.reduce((prev: number, cur: JourneyRouteLeg) => {
+                            return prev + (cur?.duration ?? 0)
+                        }, 0) ?? 0)}</span>
+                    </p>
                 ))}
             </div>
         </div>
     )
+}
+
+function formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    const hoursString = hours > 0 ? `${hours}h` : "";
+    const minutesString = minutes > 0 ? `${minutes}m` : "";
+
+    return hoursString + (hours > 0 && minutes > 0 ? " " : "") + minutesString;
 }
 
 function getLineStyle(line: any) {
@@ -60,6 +82,8 @@ function getLineStyle(line: any) {
         style.backgroundColor = 'red'
     } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
         style.backgroundColor = 'gray'
+    } else if (line === 'walk') {
+        style.backgroundColor = 'lightgray'
     }
     return  style
 }

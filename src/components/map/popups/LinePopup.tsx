@@ -15,7 +15,7 @@ function LinePopup({ line, coords }: LinePopupProps) {
         return null;
     }
 
-    const lineName = line.properties?.textEfa || '';
+    const lineName = line.properties?.textEfa || 'walk';
     const terminalStations = lineInfo.properties?.headline;
 
 
@@ -52,6 +52,8 @@ function getLineStyle(line: any) {
         style.backgroundColor = 'red'
     } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
         style.backgroundColor = 'gray'
+    } else if (line === 'walk') {
+        style.backgroundColor = 'lightgray'
     }
     return  style
 }
