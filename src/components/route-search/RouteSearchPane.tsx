@@ -3,6 +3,7 @@ import JourneyList, {JourneyItem, JourneyRouteLeg} from "../../models/journey.ts
 import './RouteSearchPane.scss'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faAngleRight, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
+import {backendUrl} from "../../constants.ts";
 
 interface RouteSearchProps {
     from?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
@@ -15,7 +16,7 @@ function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) 
     const [routes, setRoutes] = useState<JourneyList | null>(null)
 
     const searchRoute = () => {
-        fetch(`http://localhost:8080/api/v1/journeys?from=${from?.properties?.globalId}&to=${to?.properties?.globalId}`)
+        fetch(`${backendUrl}/journeys?from=${from?.properties?.globalId}&to=${to?.properties?.globalId}`)
             .then<JourneyList>(resp => resp.json())
             .then(j => setRoutes(j))
     }

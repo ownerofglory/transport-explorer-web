@@ -7,8 +7,7 @@ import StationArrivals from "../../../models/arrivals.ts";
 import {RouteSearchEvent} from "../../../events/route.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRightFromBracket, faRightToBracket} from "@fortawesome/free-solid-svg-icons";
-
-const backendUrl = "http://localhost:8080/api/v1/arrivals"
+import {backendUrl} from "../../../constants.ts";
 
 interface StationPopupProps {
     station: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>,
@@ -90,7 +89,7 @@ function StationPopup({ station, onLineClick, onPopupClose, onRouteSearch }: Sta
 
 
 function getArrivals(station: string): Promise<StationArrivals> {
-    const url = `${backendUrl}?stationId=${station}&limit=8`
+    const url = `${backendUrl}/arrivals?stationId=${station}&limit=8`
     return fetch(url).then(res => res.json())
 }
 
