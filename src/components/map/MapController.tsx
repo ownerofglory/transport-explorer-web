@@ -136,6 +136,7 @@ function MapController() {
         });
         setSidebarOpen(true)
         setSelectedLine(null);
+        setChosenStation(null)
     }
 
     const handleSidebarClose = () => {
