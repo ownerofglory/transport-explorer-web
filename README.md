@@ -1,4 +1,4 @@
-# ![](./docs/logo64x64.png) Stuttgart Öffi Explorer Frontend
+# ![](./docs/logo64x64.png) Stuttgart Transport Explorer Frontend
 
 Hobby project that aims to explore and visualize the extensive transport services provided by VVS (Verkehrs- und Tarifverbund Stuttgart) in the Stuttgart region. 
 By leveraging interactive maps and real-time data, the application offers users a way to navigate the public transportation network. 
@@ -31,3 +31,32 @@ The application provides a comprehensive route search feature that allows users 
 - Detailed Information: Each journey option provides detailed information about the lines and stops, helping users choose the most convenient route.
 
 ![](./docs/screen-journey-search.png)
+
+## Contributing
+
+Contributions are welcome! If you have any improvements, bug fixes, or new features, feel free to submit a pull request. 
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Contact
+
+If you have any questions, suggestions, or feedback, please reach out to us:
+
+- Email: [contact@ownerofglory.com](mailto:contact@ownerofglory.com)
+
+## Acknowledgements
+
+We would like to thank the following resources and contributors:
+
+- [VVS Stuttgart](https://www.vvs.de/) for providing transport data.
+- [Leaflet](https://leafletjs.com/) for the mapping library.
+- [OpenStreetMap](https://www.openstreetmap.org/) for map data.
+- [Geofabrik](https://www.geofabrik.de/) for vector map data
+
+Thank you for using Transport Explorer! We hope you find it useful and informative.
+
+---
+
+*Happy exploring!*
