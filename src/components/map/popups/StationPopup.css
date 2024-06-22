@@ -49,3 +49,51 @@
     color: #1a1919;
     cursor: pointer;
 }
+
+@media (max-width: 768px) {
+    .departures-board {
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .departure-item span {
+        margin: 0 2px;
+    }
+
+    .button-row {
+        width: 100%;
+    }
+
+    .button-row button {
+        padding: 6px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .departures-board {
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    .departure-item span {
+        margin: 0 1px;
+    }
+
+    .button-row {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .button-row button {
+        padding: 4px;
+        font-size: 10px;
+        margin-bottom: 5px;
+    }
+
+    .button-row button:last-child {
+        margin-bottom: 0;
+    }
+}

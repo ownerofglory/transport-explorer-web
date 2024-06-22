@@ -32,3 +32,11 @@
     font-size: 20px;
     cursor: pointer;
 }
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 12px;
+        border-radius: 4px;
+        width: 78%;
+    }
+}

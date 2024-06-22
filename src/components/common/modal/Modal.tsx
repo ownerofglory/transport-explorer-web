@@ -1,5 +1,7 @@
 import { ReactElement, useEffect } from "react"
 import "./Modal.scss"
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 interface ModalProps {
     children?: ReactElement | ReactElement[];
@@ -27,7 +29,9 @@ function Modal({ children, show, onClose }: ModalProps) {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>X</button>
+                <button className="modal-close" onClick={onClose}>
+                    <FontAwesomeIcon icon={faXmark} />
+                </button>
                 {children}
             </div>
         </div>
