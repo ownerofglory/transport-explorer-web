@@ -1,5 +1,5 @@
 import {useState} from "react";
-import JourneyList, {JourneyItem, JourneyRouteLeg} from "../../models/journey.ts";
+import JourneyList, {JourneyItem} from "../../models/journey.ts";
 import './RouteSearchPane.scss'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faAngleRight, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
@@ -76,6 +76,7 @@ function formatDuration(seconds: number): string {
     return hoursString + (hours > 0 && minutes > 0 ? " " : "") + minutesString;
 }
 
+
 function calculateTotalDuration(journey: JourneyItem): number {
     if (!journey.routeLegs || journey.routeLegs.length === 0) {
         return 0;
@@ -84,14 +85,25 @@ function calculateTotalDuration(journey: JourneyItem): number {
     const firstLeg = journey.routeLegs[0];
     const lastLeg = journey.routeLegs[journey.routeLegs.length - 1];
 
-    const departureTime = new Date(firstLeg.departureTimeEst ?? firstLeg.departureTimePlan as string);
-    const arrivalTime = new Date(lastLeg.arrivalTimeEst ?? lastLeg.arrivalTimePlan as string);
+    const departureTimeStr = typeof firstLeg.departureTimeEst === 'string'
+        ? firstLeg.departureTimeEst
+        : firstLeg.departureTimeEst instanceof Date
+            ? firstLeg.departureTimeEst.toISOString()
+            : (firstLeg.departureTimePlan ?? '' as string);
+
+    const arrivalTimeStr = typeof lastLeg.arrivalTimeEst === 'string'
+        ? lastLeg.arrivalTimeEst
+        : lastLeg.arrivalTimeEst instanceof Date
+            ? lastLeg.arrivalTimeEst.toISOString()
+            : (lastLeg.arrivalTimePlan ?? '' as string);
+
+    const departureTime = new Date(departureTimeStr);
+    const arrivalTime = new Date(arrivalTimeStr);
 
     const durationInSeconds = (arrivalTime.getTime() - departureTime.getTime()) / 1000;
 
     return durationInSeconds;
 }
-
 function getLineStyle(line: any) {
     const style = {
         backgroundColor: 'blue',
