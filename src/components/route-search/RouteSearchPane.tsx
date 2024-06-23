@@ -76,7 +76,11 @@ function RouteSearchPane({ from, to, dateTime, onRouteSelect }: RouteSearchProps
                                 {j.routeLegs?.map((leg, legIndex) => (
                                     <div>
                                         <p>
-                                            <span style={getLineStyle(leg.transportLine)}>{leg.transportLine}</span> {' '}
+                                            {leg.transportLine ? (
+                                                <span style={getLineStyle(leg.transportLine)}>{leg.transportLine}</span>
+                                            ) : (
+                                                <FontAwesomeIcon icon={faPersonWalking} />
+                                            )} {' '}
                                             <FontAwesomeIcon icon={faArrowRightLong} /> {' '}
                                             {leg.transportLineDestination} {' '}
                                             ({formatDate(leg.departureTimePlan)})
@@ -154,7 +158,7 @@ function getLineStyle(line: any) {
         cursor: 'pointer'
     }
     if (!line) {
-        style.backgroundColor = 'gray'
+        style.backgroundColor = 'lightgray'
     } else if (line.startsWith('U')) {
         style.backgroundColor = 'blue'
     } else if (line.startsWith('S')) {
