@@ -153,7 +153,9 @@ function getLineStyle(line: any) {
         marginTop: '2px',
         cursor: 'pointer'
     }
-    if (line.startsWith('U')) {
+    if (!line) {
+        style.backgroundColor = 'gray'
+    } else if (line.startsWith('U')) {
         style.backgroundColor = 'blue'
     } else if (line.startsWith('S')) {
         style.backgroundColor = 'green'
