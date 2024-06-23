@@ -1,8 +1,14 @@
 import { useState } from "react";
-import JourneyList, { JourneyItem } from "../../models/journey.ts";
+import JourneyList, {JourneyItem, JourneyRouteLeg} from "../../models/journey.ts";
 import './RouteSearchPane.scss';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faAngleRight, faMagnifyingGlassLocation, faPersonWalking, faShuffle} from "@fortawesome/free-solid-svg-icons";
+import {
+    faAngleRight,
+    faArrowRightLong,
+    faMagnifyingGlassLocation,
+    faPersonWalking,
+    faShuffle
+} from "@fortawesome/free-solid-svg-icons";
 import { backendUrl } from "../../constants.ts";
 import Accordion from "../common/accordion/Accordion.tsx";
 
@@ -44,7 +50,8 @@ function RouteSearchPane({ from, to, dateTime, onRouteSelect }: RouteSearchProps
                     const duration = calculateTotalDuration(j);
 
                     return (
-                        <Accordion key={j.routeLegs?.[0]?.origId} title={
+                        <Accordion key={j.routeLegs?.[0]?.origId}
+                                   title={
                             <div className="accordion-header">
                                 <p className={'route-times'}>
                                     <span>Depart: {begin && formatDate(begin)}</span>
@@ -67,15 +74,26 @@ function RouteSearchPane({ from, to, dateTime, onRouteSelect }: RouteSearchProps
                         }>
                             <div className="stop-sequence">
                                 {j.routeLegs?.map((leg, legIndex) => (
-                                    <div key={legIndex}>
-                                        {leg.stopSequence?.map((stop, stopIndex) => (
-                                            <p key={stop?.globalId}>
-                                                <span>{stopIndex + 1}.</span> {stop?.name}
-                                            </p>
-                                        ))}
-                                        {legIndex < (j.routeLegs?.length ?? 1) - 1 && (
-                                            <p className="transfer"><FontAwesomeIcon icon={faShuffle} /> Transfer</p>
-                                        )}
+                                    <div>
+                                        <p>
+                                            <span style={getLineStyle(leg.transportLine)}>{leg.transportLine}</span> {' '}
+                                            <FontAwesomeIcon icon={faArrowRightLong} /> {' '}
+                                            {leg.transportLineDestination} {' '}
+                                            ({formatDate(leg.departureTimePlan)})
+                                        </p>
+                                        <div key={legIndex}>
+                                            {leg.stopSequence?.map((stop, stopIndex) => (
+                                                <p key={stop?.globalId}>
+                                                    <span>{stopIndex + 1}.</span> {stop?.name}
+                                                </p>
+                                            ))}
+                                            {legIndex < (j.routeLegs?.length ?? 1) - 1 && (
+                                                <p className="transfer">
+                                                    <FontAwesomeIcon icon={faShuffle}/> Transfer {' '}
+                                                    ({calculateTransferTime(j.routeLegs![legIndex], j.routeLegs![legIndex + 1])})
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -193,6 +211,27 @@ function formatDate(date: any): string {
         options.month = 'short';
         return date.toLocaleDateString([], options) + ' ' + date.toLocaleTimeString([], options);
     }
+}
+
+function calculateTransferTime(currentLeg: JourneyRouteLeg, nextLeg: JourneyRouteLeg): string {
+    const arrivalTimeStr = typeof currentLeg.arrivalTimeEst === 'string'
+        ? currentLeg.arrivalTimeEst
+        : currentLeg.arrivalTimeEst instanceof Date
+            ? currentLeg.arrivalTimeEst.toISOString()
+            : (currentLeg.arrivalTimePlan ?? '' as string);
+
+    const departureTimeStr = typeof nextLeg.departureTimeEst === 'string'
+        ? nextLeg.departureTimeEst
+        : nextLeg.departureTimeEst instanceof Date
+            ? nextLeg.departureTimeEst.toISOString()
+            : (nextLeg.departureTimePlan ?? '' as string);
+
+    const arrivalTime = new Date(arrivalTimeStr);
+    const departureTime = new Date(departureTimeStr);
+
+    const transferTimeInMinutes = Math.round((departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60));
+
+    return `${transferTimeInMinutes} min`;
 }
 
 export default RouteSearchPane;
