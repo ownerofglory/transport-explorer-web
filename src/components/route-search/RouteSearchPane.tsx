@@ -2,7 +2,7 @@ import {useState} from "react";
 import JourneyList, {JourneyItem} from "../../models/journey.ts";
 import './RouteSearchPane.scss'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faAngleRight, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
+import {faAngleRight, faMagnifyingGlassLocation, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
 import {backendUrl} from "../../constants.ts";
 
 interface RouteSearchProps {
@@ -14,11 +14,17 @@ interface RouteSearchProps {
 
 function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) {
     const [routes, setRoutes] = useState<JourneyList | null>(null)
+    const [selectedRouteItem, setSelectedRouteItem] = useState<JourneyItem | null>()
 
     const searchRoute = () => {
         fetch(`${backendUrl}/journeys?from=${from?.properties?.globalId}&to=${to?.properties?.globalId}`)
             .then<JourneyList>(resp => resp.json())
             .then(j => setRoutes(j))
+    }
+
+    const handleRouteSelect = (r: JourneyItem) => {
+        onRouteSelect(r)
+        setSelectedRouteItem(r)
     }
 
     return (
@@ -29,7 +35,7 @@ function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) 
                 <p className={'route-point'}>To: <span>{to?.properties?.name}</span></p>
             </div>
             <div>
-                <button onClick={() => searchRoute()}>Search</button>
+                <button className={'search-button'} onClick={() => searchRoute()}>Search <FontAwesomeIcon icon={faMagnifyingGlassLocation} /></button>
             </div>
             <div>
                 {routes?.journeys?.map(j => {
@@ -42,7 +48,8 @@ function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) 
                                         <span>Depart: {begin && formatDate(begin)}</span>
                                         <span>Arrive: {end && formatDate(end)}</span>
                                 </p>
-                                <p onClick={() => onRouteSelect(j)} className={'route-item'}>
+                                <p onClick={() => handleRouteSelect(j)}
+                                   className={`route-item ${selectedRouteItem === j ? 'route-selected' : ''}`}>
 
                                     {j.routeLegs?.map(l => (
                                         <span>

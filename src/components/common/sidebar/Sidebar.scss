@@ -33,3 +33,9 @@
 .close-button:hover {
   color: #000000;
 }
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none; /* Hide the desktop sidebar on smaller screens */
+  }
+}

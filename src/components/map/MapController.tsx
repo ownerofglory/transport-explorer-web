@@ -20,6 +20,7 @@ import SearchBarControl from "./controls/SearchBarControl.tsx";
 import {RouteSearchEvent} from "../../events/route.ts";
 import RouteSearchPane from "../route-search/RouteSearchPane.tsx";
 import {JourneyItem} from "../../models/journey.ts";
+import SidebarMobile from "../common/sidebar/SidebarMobile.tsx";
 
 function convertJourneyItemToGeoJSON(journeyItem: JourneyItem): GeoJSON.FeatureCollection {
     const features: GeoJSON.Feature[] = [];
@@ -404,6 +405,22 @@ function MapController() {
                     ></RouteSearchPane>
                 )}
             </Sidebar>
+            <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose}>
+                {routeSearch && (
+                    <RouteSearchPane from={routeSearch.stationFrom}
+                                     to={routeSearch.stationTo}
+                                     onRouteSelect={handleRouteSelected}
+                    ></RouteSearchPane>
+                )}
+            </Sidebar>
+            <SidebarMobile isOpen={sidebarOpen} onClose={handleSidebarClose}>
+                {routeSearch && (
+                    <RouteSearchPane from={routeSearch.stationFrom}
+                                     to={routeSearch.stationTo}
+                                     onRouteSelect={handleRouteSelected}
+                    ></RouteSearchPane>
+                )}
+            </SidebarMobile>
         </ErrorBoundary>
     );
 }

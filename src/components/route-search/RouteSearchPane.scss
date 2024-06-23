@@ -5,6 +5,10 @@
   margin: 0;
 }
 
+.route-item:hover {
+  background-color: #bebebe;
+}
+
 .route-item :nth-last-child(2) .next-icon {
   display: none;
 }
@@ -19,6 +23,10 @@
   justify-content: space-between;
 }
 
+.route-selected {
+  background-color: #dddddd;
+}
+
 .route-duration {
   padding: 0 8px 0 8px;
 }
@@ -29,4 +37,12 @@
   justify-content: space-between;
   margin-bottom: 0;
   padding: 2px;
+}
+
+.search-button {
+  border: none;
+  padding: 8px;
+  background-color: #dddddd;
+  color: #1a1919;
+  cursor: pointer;
 }
