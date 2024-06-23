@@ -1,31 +1,32 @@
-import {useState} from "react";
-import JourneyList, {JourneyItem} from "../../models/journey.ts";
-import './RouteSearchPane.scss'
+import { useState } from "react";
+import JourneyList, { JourneyItem } from "../../models/journey.ts";
+import './RouteSearchPane.scss';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faAngleRight, faMagnifyingGlassLocation, faPersonWalking} from "@fortawesome/free-solid-svg-icons";
-import {backendUrl} from "../../constants.ts";
+import {faAngleRight, faMagnifyingGlassLocation, faPersonWalking, faShuffle} from "@fortawesome/free-solid-svg-icons";
+import { backendUrl } from "../../constants.ts";
+import Accordion from "../common/accordion/Accordion.tsx";
 
 interface RouteSearchProps {
-    from?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
-    to?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
-    dateTime?: Date
-    onRouteSelect: (route: JourneyItem) => void
+    from?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+    to?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+    dateTime?: Date;
+    onRouteSelect: (route: JourneyItem) => void;
 }
 
-function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) {
-    const [routes, setRoutes] = useState<JourneyList | null>(null)
-    const [selectedRouteItem, setSelectedRouteItem] = useState<JourneyItem | null>()
+function RouteSearchPane({ from, to, dateTime, onRouteSelect }: RouteSearchProps) {
+    const [routes, setRoutes] = useState<JourneyList | null>(null);
+    const [selectedRouteItem, setSelectedRouteItem] = useState<JourneyItem | null>();
 
     const searchRoute = () => {
         fetch(`${backendUrl}/journeys?from=${from?.properties?.globalId}&to=${to?.properties?.globalId}`)
             .then<JourneyList>(resp => resp.json())
-            .then(j => setRoutes(j))
-    }
+            .then(j => setRoutes(j));
+    };
 
     const handleRouteSelect = (r: JourneyItem) => {
-        onRouteSelect(r)
-        setSelectedRouteItem(r)
-    }
+        onRouteSelect(r);
+        setSelectedRouteItem(r);
+    };
 
     return (
         <div>
@@ -39,38 +40,51 @@ function RouteSearchPane({from, to, dateTime, onRouteSelect}: RouteSearchProps) 
             </div>
             <div>
                 {routes?.journeys?.map(j => {
-                    const {begin, end} = getTripBeginEnd(j)
-                    const duration = calculateTotalDuration(j)
+                    const { begin, end } = getTripBeginEnd(j);
+                    const duration = calculateTotalDuration(j);
 
-                        return (
-                            <div>
+                    return (
+                        <Accordion key={j.routeLegs?.[0]?.origId} title={
+                            <div className="accordion-header">
                                 <p className={'route-times'}>
-                                        <span>Depart: {begin && formatDate(begin)}</span>
-                                        <span>Arrive: {end && formatDate(end)}</span>
+                                    <span>Depart: {begin && formatDate(begin)}</span>
+                                    <span>Arrive: {end && formatDate(end)}</span>
                                 </p>
                                 <p onClick={() => handleRouteSelect(j)}
                                    className={`route-item ${selectedRouteItem === j ? 'route-selected' : ''}`}>
-
                                     {j.routeLegs?.map(l => (
-                                        <span>
-                                    <span style={getLineStyle(l.transportLine ?? 'walk')}>
-                                        {l.transportLine ?? <FontAwesomeIcon color={'black'} icon={faPersonWalking}/>}
-                                    </span>
-
-                                    <FontAwesomeIcon className={'next-icon'} icon={faAngleRight}/>
-                                </span>
+                                        <span key={l.origId}>
+                                            <span style={getLineStyle(l.transportLine ?? 'walk')}>
+                                                {l.transportLine ??
+                                                    <FontAwesomeIcon color={'black'} icon={faPersonWalking}/>}
+                                            </span>
+                                            <FontAwesomeIcon className={'next-icon'} icon={faAngleRight}/>
+                                        </span>
                                     ))}
-                                    <span
-                                        className={'route-duration'}>{formatDuration(duration)}
-                                </span>
+                                    <span className={'route-duration'}>{formatDuration(duration)}</span>
                                 </p>
                             </div>
-                        )
-                    }
-                )}
+                        }>
+                            <div className="stop-sequence">
+                                {j.routeLegs?.map((leg, legIndex) => (
+                                    <div key={legIndex}>
+                                        {leg.stopSequence?.map((stop, stopIndex) => (
+                                            <p key={stop?.globalId}>
+                                                <span>{stopIndex + 1}.</span> {stop?.name}
+                                            </p>
+                                        ))}
+                                        {legIndex < (j.routeLegs?.length ?? 1) - 1 && (
+                                            <p className="transfer"><FontAwesomeIcon icon={faShuffle} /> Transfer</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </Accordion>
+                    );
+                })}
             </div>
         </div>
-    )
+    );
 }
 
 function formatDuration(seconds: number): string {
@@ -82,7 +96,6 @@ function formatDuration(seconds: number): string {
 
     return hoursString + (hours > 0 && minutes > 0 ? " " : "") + minutesString;
 }
-
 
 function calculateTotalDuration(journey: JourneyItem): number {
     if (!journey.routeLegs || journey.routeLegs.length === 0) {
@@ -111,6 +124,7 @@ function calculateTotalDuration(journey: JourneyItem): number {
 
     return durationInSeconds;
 }
+
 function getLineStyle(line: any) {
     const style = {
         backgroundColor: 'blue',
@@ -181,4 +195,4 @@ function formatDate(date: any): string {
     }
 }
 
-export default RouteSearchPane
+export default RouteSearchPane;
