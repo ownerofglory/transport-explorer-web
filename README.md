@@ -6,7 +6,7 @@ Key features include detailed route search between stops, visualization of trans
 
 Currently, being developed
 
-**You can find demo here**: [vvs-fe.vercel.app](https://vvs-fe.vercel.app/)
+**You can find demo here**: [transport-explorer.vercel.app](https://transport-explorer.vercel.app/)
 
 ![](./docs/mobile.png)
 
