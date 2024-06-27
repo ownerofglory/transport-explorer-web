@@ -6,7 +6,7 @@ import "./StationPopup.css";
 import StationArrivals from "../../../models/arrivals.ts";
 import {RouteSearchEvent} from "../../../events/route.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faRightFromBracket, faRightToBracket} from "@fortawesome/free-solid-svg-icons";
+import {faRightFromBracket, faRightToBracket, faTreeCity} from "@fortawesome/free-solid-svg-icons";
 import {backendUrl} from "../../../constants.ts";
 
 interface StationPopupProps {
@@ -64,6 +64,7 @@ function StationPopup({ station, onLineClick, onPopupClose, onRouteSearch }: Sta
         <Modal show={true} onClose={onPopupClose}>
             <div style={{maxWidth: '480px'}}>
                 <h3><strong>{station.properties?.name}</strong></h3>
+                <p><FontAwesomeIcon icon={faTreeCity} /> {station.properties?.municipality} ({station.properties?.subDistrict})</p>
                 <p><strong>Lines:</strong></p>
                 <div style={{display: 'flex', flexWrap: 'wrap'}}>
                     {formattedLines}
