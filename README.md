@@ -1,9 +1,16 @@
-# ![](./docs/logo64x64.png) Stuttgart Transport Explorer Frontend
+# ![](./docs/logo64x64.png) Stuttgart Transport Explorer
 
 Hobby project that aims to explore and visualize the extensive transport services provided by VVS (Verkehrs- und Tarifverbund Stuttgart) in the Stuttgart region. 
 By leveraging interactive maps and real-time data, the application offers users a way to navigate the public transportation network. 
 Key features include detailed route search between stops, visualization of transport lines and stations, and information on arrivals and departures. 
 
+## ⚠️ Disclaimer
+
+**🇬🇧 This is not an official offer of the VVS. The VVS is not liable for the content.**
+
+**🇩🇪 Es handelt sich um kein offizielles Angebot des VVS. Der VVS haftet nicht für die Inhalte.**
+
+## Status
 Currently, being developed
 
 **You can find demo here**: [transport-explorer.vercel.app](https://transport-explorer.vercel.app/)

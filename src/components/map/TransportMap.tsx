@@ -8,7 +8,7 @@ function TransportMap() {
             width: '100vw'
         }}>
             <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='Contact <a href="https://github.com/ownerofglory">@ownerofglory</a> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapController></MapController>

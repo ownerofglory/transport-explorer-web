@@ -2,6 +2,7 @@ import '../node_modules/leaflet/dist/leaflet.css'
 import './App.css'
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import MapPage from "./pages/MapPage.tsx";
+import {Disclaimer} from "./components/disclaimer/Disclaimer.tsx";
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
                <Route path={'/map'} element={<MapPage/>} />
            </Routes>
        </BrowserRouter>
+        <Disclaimer/>
     </>
   )
 }

@@ -1,0 +1,9 @@
+.disclaimer * {
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+@media (max-width: 480px) {
+  .disclaimer * {
+    padding: 0 12px 0 12px;
+  }
+}
