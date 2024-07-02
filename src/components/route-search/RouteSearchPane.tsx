@@ -36,10 +36,10 @@ function RouteSearchPane({ from, to, dateTime, onRouteSelect }: RouteSearchProps
 
     return (
         <div>
-            <div>
+            <div className={'route-directions'}>
                 <p><span>{dateTime?.toLocaleDateString()}</span></p>
-                <p className={'route-point'}>From: <span>{from?.properties?.name}</span></p>
-                <p className={'route-point'}>To: <span>{to?.properties?.name}</span></p>
+                <p className={'route-point'}>From: <input type={'text'} value={from?.properties?.name}/></p>
+                <p className={'route-point'}>To: <input type={'text'} value={to?.properties?.name}/></p>
             </div>
             <div>
                 <button className={'search-button'} onClick={() => searchRoute()}>Search <FontAwesomeIcon icon={faMagnifyingGlassLocation} /></button>

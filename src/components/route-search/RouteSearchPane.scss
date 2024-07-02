@@ -50,3 +50,17 @@
   color: #1a1919;
   cursor: pointer;
 }
+
+.route-directions input {
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+@media(max-width: 480px) {
+  .route-directions input {
+    border: none;
+    padding: 8px;
+    border-radius: 2px;
+  }
+}
