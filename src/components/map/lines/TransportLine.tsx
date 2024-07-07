@@ -1,12 +1,31 @@
-import {Polyline} from "react-leaflet";
+import {Polyline, useMap} from "react-leaflet";
 import {LatLngExpression} from "leaflet";
+import {useEffect, useState} from "react";
 
 interface TransportLineProps {
     line: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
 }
 
 function TransportLine({line}: TransportLineProps) {
-    console.log(line)
+    const map = useMap()
+    const [zoomFactor, setZoomFactor] = useState(1)
+    useEffect(() => {
+        const onZoomEnd = () => {
+            const zoom = map.getZoom()
+            if (zoom <= 13.5) {
+                setZoomFactor(1)
+            } else if (zoom > 13.5 && zoom <= 16) {
+                setZoomFactor(2)
+            } else {
+                setZoomFactor(3)
+            }
+        };
+        map.on('zoomend', onZoomEnd);
+        return () => {
+            map.off('zoomend', onZoomEnd);
+        };
+    }, [map]);
+
     if (!line.geometry || (line.geometry.type !== 'MultiLineString' && line.geometry.type !== 'LineString')) {
         console.error('Invalid geometry type:', line.geometry);
         return null;
@@ -46,9 +65,30 @@ function TransportLine({line}: TransportLineProps) {
     }
 
     return (
-        <Polyline key={line.properties?.id} dashArray={line.properties?.textEfa ? undefined : '2, 2'} positions={latLngCoords} color={getLineColor(line.properties?.textEfa)}>
+        <Polyline key={line.properties?.id} weight={getLineWeight(line.properties?.textEfa, zoomFactor)} dashArray={line.properties?.textEfa ? undefined : '2, 2'} positions={latLngCoords} color={getLineColor(line.properties?.textEfa)}>
         </Polyline>
     )
+}
+
+function getLineWeight(line: any, factor: number): number {
+    if (typeof line !== 'string') {
+        return 1
+    }
+
+    if (line.startsWith('U')) {
+        return 2 * factor
+    } else if (line.startsWith('S')) {
+        return 2 * factor
+    } else if (line === '10' || line === '20') {
+        return 2 * factor
+    } else if (line.startsWith('R') || line.startsWith('IR') || line.startsWith('IC') || line.startsWith('MEX')) {
+        return 2 * factor
+    } else if (!isNaN(Number(line)) || line.startsWith('N') || line.startsWith('SEV') || line.startsWith('X')) {
+        return 1 * factor
+    } else if (line === '' || !line) {
+        return 2 * factor
+    }
+    return 1 * factor
 }
 
 function getLineColor(line: any): string {

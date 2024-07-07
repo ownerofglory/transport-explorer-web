@@ -292,7 +292,7 @@ function MapController() {
         <ErrorBoundary>
             <LayersControl>
                 <TransportTypeControl onToggle={handleToggle} filters={filters}/>
-                {zoomLvl >= 12 && !selectedRoute &&  (
+                {zoomLvl >= 13 && !selectedRoute &&  (
                     <div key={'stations'}>
                         {selectedLine ? (
                             filteredStations.map((f: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>) => (

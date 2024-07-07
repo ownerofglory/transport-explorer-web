@@ -19,6 +19,8 @@ function StationMarker({station, iconUrl, children, onClick}: StationProps) {
         const onZoomEnd = () => {
             const zoom = map.getZoom()
             if (zoom <= 13.5) {
+                setIconSize(14)
+            } else if (zoom > 13.5 && zoom <= 15) {
                 setIconSize(16)
             } else {
                 setIconSize(20)
