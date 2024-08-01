@@ -9,15 +9,17 @@
   transition: left 0.3s;
   z-index: 1000;
   box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
 
-.sidebar.open {
-  left: 0; /* Slide the sidebar into view */
+  &.open {
+    left: 0; /* Slide the sidebar into view */
+  }
 }
 
 .sidebar-content {
   display: flex;
   flex-direction: column;
+  height: 100%; /* Ensure the content takes the full height */
+  overflow-y: auto; /* Enable vertical scrolling */
   padding: 20px;
 }
 
@@ -33,6 +35,7 @@
 .close-button:hover {
   color: #000000;
 }
+
 
 @media (max-width: 767px) {
   .sidebar {
